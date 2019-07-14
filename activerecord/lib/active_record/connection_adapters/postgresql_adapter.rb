@@ -409,6 +409,18 @@ module ActiveRecord
         index.using == :btree || super
       end
 
+      def reset_privileges
+        execute("reset role")
+      end
+
+      def drop_privileges
+        r = Rails.configuration.test_role
+        if r.present?
+          execute("set role #{r}")
+          ActiveRecord::Base.configurations[Rails.env]['username'] = r
+        end
+      end
+
       private
         # See https://www.postgresql.org/docs/current/static/errcodes-appendix.html
         VALUE_LIMIT_VIOLATION = "22001"

@@ -563,11 +563,17 @@ module ActiveRecord
               table_rows_for_connection[table].unshift(*rows)
             end
           end
+          if conn.respond_to?(:reset_privileges)
+            conn.reset_privileges
+          end
           conn.insert_fixtures_set(table_rows_for_connection, table_rows_for_connection.keys)
 
           # Cap primary key sequences to max(pk).
           if conn.respond_to?(:reset_pk_sequence!)
             set.each { |fs| conn.reset_pk_sequence!(fs.table_name) }
+          end
+          if conn.respond_to?(:drop_privileges)
+            conn.drop_privileges
           end
         end
 
