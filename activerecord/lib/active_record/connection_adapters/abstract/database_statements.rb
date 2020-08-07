@@ -432,7 +432,7 @@ module ActiveRecord
         end
 
         def build_fixture_sql(fixtures, table_name)
-          columns = schema_cache.columns_hash(table_name)
+          columns = schema_cache.columns_hash(table_name).reject { |_, c| c.virtual? }
 
           values = fixtures.map do |fixture|
             fixture = fixture.stringify_keys
