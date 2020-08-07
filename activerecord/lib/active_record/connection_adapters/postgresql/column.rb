@@ -7,9 +7,10 @@ module ActiveRecord
       delegate :array, :oid, :fmod, to: :sql_type_metadata
       alias :array? :array
 
-      def initialize(*, max_identifier_length: 63, **)
+      def initialize(*, max_identifier_length: 63, generated: nil, **)
         super
         @max_identifier_length = max_identifier_length
+        @generated = generated
       end
 
       def serial?
@@ -18,6 +19,14 @@ module ActiveRecord
         if %r{\Anextval\('"?(?<sequence_name>.+_(?<suffix>seq\d*))"?'::regclass\)\z} =~ default_function
           sequence_name_from_parts(table_name, name, suffix) == sequence_name
         end
+      end
+
+      def virtual?
+        @generated == "s"
+      end
+
+      def has_default?
+        super && !virtual?
       end
 
       protected
