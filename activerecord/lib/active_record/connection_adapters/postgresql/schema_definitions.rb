@@ -175,6 +175,15 @@ module ActiveRecord
       class TableDefinition < ActiveRecord::ConnectionAdapters::TableDefinition
         include ColumnMethods
 
+        def new_column_definition(name, type, **options) # :nodoc:
+          case type
+          when :virtual
+            type = options[:type]
+          end
+
+          super
+        end
+
         private
           def integer_like_primary_key_type(type, options)
             if type == :bigint || options[:limit] == 8
